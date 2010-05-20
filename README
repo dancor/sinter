@@ -1,0 +1,40 @@
+Sinter is an HTML5 implementation of affine-projective steiner triple
+system card games.  These are card games in which you are trying to
+find card triples which satisfy a simple rule.  These games also have
+the property that for any two cards there is a unique third card that
+completes the triple.  The triples in these games also satisfy a
+certain technical symmetric property, and are the only steiner triple
+system card games that do so.
+
+These card games exist for all card deck sizes of the form
+Product(2^i - 1)
+where the i's are positive integers (not necessarily distinct).
+The popular Set brand card game has i's = 2,2,2,2.
+
+Sinter currently supports all 17 non-trivial deck sizes under 256:
+7,9,15,21,27,31,45,63,81,93,105,127,135,189,217,243,255
+
+    i's   bits
+7   3     3
+9   2^2   4
+15  4     4
+21  2,3   5
+27  2^3   6
+31  5     5
+45  2,4   6
+63  6 (also 2^2,3; only case of two-at-once?)  6(7)
+81  2^4   8
+93  2,5   7
+105 3,4   7
+127 7     7
+135 2^2,4 8
+189 2^3,3 9
+217 3,5   8
+243 2^5   10
+255 8     8
+
+All have 5 or fewer property-sets with 8 or fewer bits each,
+and 10 or fewer total bits per card.
+
+Todo
+- Currently hard-coded to 93-card deck for initial testing.

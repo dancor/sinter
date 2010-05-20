@@ -1,0 +1,120 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<title>sinter</title>
+<style>
+body {
+  margin: 0px 0px 0px 0px;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+</style>
+<script type="text/javascript">
+// are we overusing globals
+var cardBg = "#FFF";
+var cardFg = "#000";
+var canv;
+var g;
+var winW = 0;
+var winH = 0;
+var cardBitCounts = [];
+function init() {
+  canv = document.getElementById("canvas");
+  winW = window.innerWidth;
+  winH = window.innerWidth;
+  canv.width = winW;
+  canv.height = winH;
+  g = canv.getContext("2d");
+  g.fillStyle = "#0F0";
+  g.fillRect(0, 0, 12000, 4000);
+
+  // hardcoded
+  cardBitCounts = [2, 5];
+  var card = randCard();
+  drawCard(card);
+}
+// this function is really just for testing
+function randCard() {
+  var ret = [];
+  for (var i in cardBitCounts) {
+    bits = cardBitCounts[i];
+    var curBits = [];
+    for (var j = 0; j < bits; j++) {
+      curBits[j] = randInt(0, 1);
+    }
+    ret[i] = curBits;
+  }
+  return ret;
+}
+function drawCard(card) {
+  var x = 10;
+  var y = 10;
+  var omni = 24;
+  var bitW = 2 * omni;
+  var bitH = 2 * omni;
+  var propSpacing = omni;
+  var marginW = omni;
+  var marginH = omni;
+  // todo: generate
+  var rowCounts = [[2], [3, 2]];
+  var i;
+  var j;
+  var k;
+
+  var cardH = marginH * 2;
+  var maxRowCount = 0;
+  for (i in rowCounts) {
+    var counts = rowCounts[i];
+    for (j in counts) {
+      count = counts[j];
+      if (count > maxRowCount) {
+        maxRowCount = count;
+      }
+      cardH += bitH;
+    }
+    cardH += propSpacing;
+  }
+  cardH -= propSpacing;
+  var cardW = maxRowCount * bitW + 2 * marginW;
+
+  g.fillStyle = cardBg;
+  g.strokeStyle = cardFg;
+  g.fillRect(x, y, cardW, cardH);
+  g.strokeRect(x, y, cardW, cardH);
+
+  var curY = marginH;
+  g.fillStyle = cardFg;
+  g.strokeStyle = "#888";
+  for (i in rowCounts) {
+    var counts = rowCounts[i];
+    var curCol = 0;
+    for (j in counts) {
+      var count = counts[j];
+      for (k = 0; k < count; k++) {
+        var bitX = x + cardW / 2 + (k - count / 2) * bitW;
+        if (!card[i][curCol]) {
+          g.fillRect(bitX, y + curY, bitW, bitH);
+        }
+        g.strokeRect(bitX, y + curY, bitW, bitH);
+        curCol++;
+      }
+      curY += bitH;
+    }
+    curY += propSpacing;
+  }
+}
+// a uniform random float in [a, b)
+function randFloat(a, b) {
+  return Math.random() * (b - a) + a;
+}
+// a uniform random int in [a, b]
+function randInt(a, b) {
+  return Math.floor(randFloat(a, b + 1));
+}
+</script>
+</head>
+<body onload="init();" onmousedown="return false;">
+<canvas id="canvas" width=0 height=0></canvas>
+</body>
+</html>
