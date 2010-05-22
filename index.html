@@ -9,6 +9,13 @@ body {
   overflow-x: hidden;
   overflow-y: hidden;
 }
+#chooseDeckSize {
+  background: black;
+  color: white;
+}
+.bigMenu {
+  font-size: 30px;
+}
 </style>
 <script type="text/javascript">
 // are we overusing globals
@@ -42,10 +49,25 @@ var cardSepW = omni / 2;
 var cardSepH = omni / 2;
 function init() {
   initWin();
-  initGameType();
-  initGame();
+  var deckTypeStr = getParam("d");
+  if (deckTypeStr) {
+    menu.style.display = "none";
+    // fixme: hack; should decode
+    //cardBitCounts = deckTypeStr.split(",");
+    cardBitCounts = deckTypeStr.split("%2C").slice(0, 32);
+    for (var i in cardBitCounts) {
+      var n = Number(cardBitCounts[i]);
+      if (isNaN(n) || n < 2 || n > 16) {
+        n = 2;
+      }
+      cardBitCounts[i] = n;
+    }
+    initGameType();
+    initGame();
+  }
 }
 function initWin() {
+  menu = document.getElementById("chooseDeckSize");
   canv = document.getElementById("canvas");
   winW = window.innerWidth;
   winH = window.innerWidth;
@@ -56,9 +78,6 @@ function initWin() {
   g.fillRect(0, 0, winW, winH);
 }
 function initGameType() {
-  // hardcoded
-  //cardBitCounts = [2, 2, 2];
-  cardBitCounts = [2, 5];
   rowCounts = [];
   for (var i in cardBitCounts) {
     var c = cardBitCounts[i];
@@ -97,11 +116,12 @@ function initGameType() {
   cardH -= propSpacing;
   cardW = maxRowCount * bitW + 2 * cardMarginW;
 
-  // todo: compute this based on odds of finding a set?
-  dealInitially = 12;
+  // todo: cooler heuristic?
+  dealInitially = Math.max(3, Math.round(12 * deckOrig.length / 81));
 
-  // todo: compute based on screen?
-  dealCardW = 4;
+  // todo: cooler width and placement heuristics?
+  dealCardW = Math.floor(
+    (winW - 2 * tableMarginW + cardSepW) / (cardW + cardSepW));
   cardsOut = replicateArr(Math.ceil(deckOrig.length / dealCardW), 
     replicate(dealCardW, false));
 }
@@ -156,6 +176,11 @@ function drawCard(card, x, y) {
     curY += propSpacing;
   }
 }
+
+//
+// gen util
+//
+
 // a uniform random float in [a, b)
 function randFloat(a, b) {
   return Math.random() * (b - a) + a;
@@ -174,6 +199,18 @@ function shuffle(a) {
     var tmp = a[i];
     a[i] = a[j];
     a[j] = tmp;
+  }
+}
+function getParam(name) {
+  // fixme: make this more correct and do decoding?
+  name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+  var regexS = "[\\?&]" + name + "=([^&#]*)";
+  var regex = new RegExp(regexS);
+  var results = regex.exec(window.location.href);
+  if (results == null) {
+    return null;
+  } else {
+    return results[1];
   }
 }
 
@@ -232,7 +269,32 @@ function arrCopy(arr) {
 }
 </script>
 </head>
-<body onload="init();" onmousedown="return false;">
-<canvas id="canvas" width=0 height=0></canvas>
+<body onload="init();">
+<div id="chooseDeckSize" class="bigMenu">
+<form>
+Choose Deck Size
+<select name="d" class="bigMenu">
+<option value="3">7</option>
+<option value="2,2">9</option>
+<option value="4">15</option>
+<option value="2,3">21</option>
+<option value="2,2,2">27</option>
+<option value="5">31</option>
+<option value="2,4">45</option>
+<option value="6">63</option>
+<option value="2,2,2,2">81</option>
+<option value="2,5" selected>93</option>
+<option value="3,4">105</option>
+<option value="7">127</option>
+<option value="2,2,4">135</option>
+<option value="2,2,2,3">189</option>
+<option value="3,5">217</option>
+<option value="2,2,2,2,2">243</option>
+<option value="8">255</option>
+</select>
+<input class="bigMenu" type="submit" value="Go" />
+</form>
+</div>
+<canvas id="canvas" width=0 height=0 onmousedown="return false;"></canvas>
 </body>
 </html>
