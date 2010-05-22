@@ -9,17 +9,19 @@ body {
   overflow-x: hidden;
   overflow-y: hidden;
 }
-#chooseDeckSize {
-  background: black;
-  color: white;
+#gameBar {
+  position: absolute;
 }
 .bigMenu {
   font-size: 30px;
 }
+.header {
+  background: black;
+  color: white;
+}
 </style>
 <script type="text/javascript">
 // are we overusing globals
-var menu;
 var canv;
 var g;
 var winW = 0;
@@ -35,27 +37,45 @@ var deckPos = 0;
 var cardsOut = [[]];
 var dealCardW = 0;
 // gfx settings
-var cardBg = "#000";
-var cardFg = "#FFF";
-var winBg = "#070";
-var omni = 24;
-var bitW = 2 * omni;
-var bitH = 2 * omni;
-var propSpacing = omni;
-var cardMarginW = omni;
-var cardMarginH = omni;
-var tableMarginW = omni / 2;
-var tableMarginH = omni / 2;
-var cardSepW = omni / 2;
-var cardSepH = omni / 2;
+var cardBg = "";
+var cardFg = "";
+var winBg = "";
+var omni = 0;
+var bitW = 0;
+var bitH = 0;
+var propSpacing = 0;
+var cardMarginW = 0;
+var cardMarginH = 0;
+var tableMarginW = 0;
+var tableMarginH = 0; 
+var cardSepW = 0;
+var cardSepH = 0;
 function init() {
-  menu = document.getElementById("chooseDeckSize");
+  var menuBar = document.getElementById("menuBar");
+  var gameBar = document.getElementById("gameBar");
+  var dealMore = document.getElementById("dealMore");
   canv = document.getElementById("canvas");
   g = canv.getContext("2d");
+
+  cardBg = "#000";
+  cardFg = "#FFF";
+  winBg = "#070";
+  omni = 24;
+  bitW = 2 * omni;
+  bitH = 2 * omni;
+  propSpacing = omni;
+  cardMarginW = omni;
+  cardMarginH = omni;
+  tableMarginW = omni / 2;
+  tableMarginH = omni / 2 + gameBar.clientHeight;
+  cardSepW = omni / 2;
+  cardSepH = omni / 2;
+
   initWin();
   var deckTypeStr = getParam("d");
   if (deckTypeStr) {
-    menu.style.display = "none";
+    menuBar.style.display = "none";
+    gameBar.style.display = "inline";
     // fixme: hack; should decode
     //cardBitCounts = deckTypeStr.split(",");
     cardBitCounts = deckTypeStr.split("%2C").slice(0, 32);
@@ -84,6 +104,7 @@ function init() {
     }
     return true;
   }
+  dealMore.onclick = dealCard;
 }
 function initWin() {
   winW = window.innerWidth;
@@ -291,31 +312,34 @@ function arrCopy(arr) {
 }
 </script>
 </head>
-<body onload="init();">
-<div id="chooseDeckSize" class="bigMenu">
-<form>
-Choose Deck Size
-<select name="d" class="bigMenu">
-<option value="3">7</option>
-<option value="2,2">9</option>
-<option value="4">15</option>
-<option value="2,3">21</option>
-<option value="2,2,2">27</option>
-<option value="5">31</option>
-<option value="2,4">45</option>
-<option value="6">63</option>
-<option value="2,2,2,2">81</option>
-<option value="2,5" selected>93</option>
-<option value="3,4">105</option>
-<option value="7">127</option>
-<option value="2,2,4">135</option>
-<option value="2,2,2,3">189</option>
-<option value="3,5">217</option>
-<option value="2,2,2,2,2">243</option>
-<option value="8">255</option>
-</select>
-<input class="bigMenu" type="submit" value="Go" />
-</form>
+<body onload="init()">
+<div id="menuBar" class="bigMenu header">
+  <form>
+  Choose Deck Size
+  <select name="d" class="bigMenu">
+  <option value="3">7</option>
+  <option value="2,2">9</option>
+  <option value="4">15</option>
+  <option value="2,3">21</option>
+  <option value="2,2,2">27</option>
+  <option value="5">31</option>
+  <option value="2,4">45</option>
+  <option value="6">63</option>
+  <option value="2,2,2,2">81</option>
+  <option value="2,5" selected>93</option>
+  <option value="3,4">105</option>
+  <option value="7">127</option>
+  <option value="2,2,4">135</option>
+  <option value="2,2,2,3">189</option>
+  <option value="3,5">217</option>
+  <option value="2,2,2,2,2">243</option>
+  <option value="8">255</option>
+  </select>
+  <input class="bigMenu" type="submit" value="Go" />
+  </form>
+</div>
+<div id="gameBar" class="bigMenu header">
+  <input id="dealMore" class="bigMenu" type="button" value="Deal More" />
 </div>
 <canvas id="canvas" width=0 height=0 onmousedown="return false;"></canvas>
 </body>
