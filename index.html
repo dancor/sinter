@@ -37,6 +37,7 @@ var canv = undefined;
 var g = undefined;
 var cardsLeftDiv = undefined;
 var timerDiv = undefined;
+var dealMoreBtn = undefined;
 var winW = 0;
 var winH = 0;
 var cardBitCounts = [];
@@ -74,7 +75,8 @@ var cardSepH = 0;
 function init() {
   var menuBar = document.getElementById("menuBar");
   var gameBar = document.getElementById("gameBar");
-  var dealMore = document.getElementById("dealMore");
+  var cheatBtn = document.getElementById("cheat");
+  dealMoreBtn = document.getElementById("dealMore");
   cardsLeftDiv = document.getElementById("cardsLeft");
   canv = document.getElementById("canvas");
   g = canv.getContext("2d");
@@ -127,10 +129,42 @@ function init() {
     initGame();
   }
   window.onresize = resize;
-  dealMore.onclick = dealCard;
-  canv.onclick = click;
+  canv.onclick = canvClick;
+  dealMoreBtn.onclick = dealCardClick;
+  cheatBtn.onclick = cheatClick;
 }
-function click(e) {
+function cheatClick() {
+  var ret = findAllTriples();
+  if (arrEq(ret, [])) {
+    dealCard();
+  } else {
+    cardsBad = ret[0];
+    console.log(cardsBad);
+    redraw();
+  }
+}
+function findAllTriples() {
+  // in-progress: we just find one right now
+  var cardsPos = [];
+  for (var y = 0; cardsOut[y]; y++) {
+    for (var x = 0; x < dealCardW; x++) {
+      if (cardsOut[y][x]) {
+        cardsPos = cardsPos.concat([[cardsOut[y][x], [x, y]]]);
+      }
+    }
+  }
+  for (var i = 0; i < cardsPos.length; i++) {
+    for (var j = i + 1; j < cardsPos.length; j++) {
+      for (var k = j + 1; k < cardsPos.length; k++) {
+        if (isLegalTriple(cardsPos[i][0], cardsPos[j][0], cardsPos[k][0])) {
+          return [[cardsPos[i][1], cardsPos[j][1], cardsPos[k][1]]];
+        }
+      }
+    }
+  }
+  return [];
+}
+function canvClick(e) {
   var xRel = e.x - tableMarginW;
   if (xRel < 0) {
     return;
@@ -327,7 +361,7 @@ function initGame() {
   initCardsOut();
   cardsSelected = [];
   cardsBad = [];
-  dealMore.value = "Deal More";
+  dealMoreBtn.value = "Deal More";
   deckPos = 0;
   deck = arrCopy(deckOrig);
   shuffle(deck);
@@ -356,7 +390,14 @@ function dealCard() {
   var n = deck.length - deckPos;
   cardsLeftDiv.innerHTML = n + " left";
   if (n == 0) {
-    dealMore.value = "New Deal";
+    dealMoreBtn.value = "New Deal";
+  }
+}
+function dealCardClick() {
+  if (allowOverdeal || arrEq(findAllTriples(), [])) {
+    dealCard();
+  } else {
+    alert('keep looking');
   }
 }
 function placeCard(card) {
@@ -565,6 +606,7 @@ function any(f, a) {
   <input id="dealMore" class="bigMenu left" type="button" value="Deal More" />
   <div id="cardsLeft" class="tableBg left"></div>
   <div id="timer" class="left">0s</div>
+  <input id="cheat" class="bigMenu left" type="button" value="Cheat" />
 </div>
 <canvas id="canvas" width=0 height=0 onmousedown="return false;"></canvas>
 </body>
