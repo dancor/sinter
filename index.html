@@ -23,19 +23,20 @@ body {
   background: black;
   color: white;
 }
-#dealMore {
+.left {
+  margin: 4px;
   float: left;
 }
 #cardsLeft {
-  float: left;
-  margin: 4px;
   color: white;
 }
 </style>
 <script type="text/javascript">
 // are we overusing globals
-var canv;
-var g;
+var canv = undefined;
+var g = undefined;
+var cardsLeftDiv = undefined;
+var timerDiv = undefined;
 var winW = 0;
 var winH = 0;
 var cardBitCounts = [];
@@ -50,7 +51,9 @@ var cardsOut = [[]];
 var dealCardW = 0;
 var cardsSelected = [];
 var cardsBad = [];
-var cardsLeft;
+var timerId = 0;
+var startTime = 0;
+var allowOverdeal = false;
 // gfx settings
 var cardBgC = "";
 var cardBgCSel = "";
@@ -72,9 +75,10 @@ function init() {
   var menuBar = document.getElementById("menuBar");
   var gameBar = document.getElementById("gameBar");
   var dealMore = document.getElementById("dealMore");
-  cardsLeft = document.getElementById("cardsLeft");
+  cardsLeftDiv = document.getElementById("cardsLeft");
   canv = document.getElementById("canvas");
   g = canv.getContext("2d");
+  timerDiv = document.getElementById("timer");
 
   cardBgC = "#000";
   cardBgCSel = "#004";
@@ -83,7 +87,13 @@ function init() {
   winBgC = "#070";
 
   initWin();
+
   var deckTypeStr = getParam("d");
+  if (!getParam("t")) {
+    timerDiv.style.display = 'none';
+  }
+  allowOverdeal = getParam("o") == "1";
+
   if (deckTypeStr) {
     menuBar.style.display = "none";
     gameBar.style.display = "inline";
@@ -324,6 +334,12 @@ function initGame() {
   for (i = 0; i < dealInitially; i++) {
     dealCard();
   }
+  startTime = (new Date()).getTime();
+  timerId = setInterval(updateTimer, 1000);
+}
+function updateTimer() {
+  var curTime = (new Date()).getTime();
+  timerDiv.innerHTML = Math.round((curTime - startTime) / 1000) + 's';
 }
 function dealCard() {
   if (deck.length == deckPos) {
@@ -338,7 +354,7 @@ function dealCard() {
   drawCardOut(tmp[0], tmp[1]);
   deckPos++;
   var n = deck.length - deckPos;
-  cardsLeft.innerHTML = n + " left";
+  cardsLeftDiv.innerHTML = n + " left";
   if (n == 0) {
     dealMore.value = "New Deal";
   }
@@ -539,12 +555,16 @@ function any(f, a) {
   <option value="2,2,2,2,2">243</option>
   <option value="8">255</option>
   </select>
+  <input type="checkbox" name="t" class="bigMenu" value="1" />timer
+  <input type="checkbox" name="o" class="bigMenu" value="1" checked 
+  />allow-overdeal
   <input class="bigMenu" type="submit" value="Go" />
   </form>
 </div>
 <div id="gameBar" class="bigMenu tableBg">
-  <input id="dealMore" class="bigMenu" type="button" value="Deal More" />
-  <div id="cardsLeft" class="tableBg"></div>
+  <input id="dealMore" class="bigMenu left" type="button" value="Deal More" />
+  <div id="cardsLeft" class="tableBg left"></div>
+  <div id="timer" class="left">0s</div>
 </div>
 <canvas id="canvas" width=0 height=0 onmousedown="return false;"></canvas>
 </body>
