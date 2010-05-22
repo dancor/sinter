@@ -12,44 +12,49 @@ body {
 </style>
 <script type="text/javascript">
 // are we overusing globals
-var cardBg = "#FFF";
-var cardFg = "#000";
+var cardBg = "#000";
+var cardFg = "#FFF";
+var winBg = "#070";
 var canv;
 var g;
 var winW = 0;
 var winH = 0;
 var cardBitCounts = [];
+var deckOrig = [];
+var deck = [];
 function init() {
+  initWin();
+  initGameType();
+  initGame();
+
+  drawCard(deck[0], 10, 10);
+}
+function initWin() {
   canv = document.getElementById("canvas");
   winW = window.innerWidth;
   winH = window.innerWidth;
   canv.width = winW;
   canv.height = winH;
   g = canv.getContext("2d");
-  g.fillStyle = "#0F0";
-  g.fillRect(0, 0, 12000, 4000);
-
+  g.fillStyle = winBg;
+  g.fillRect(0, 0, winW, winH);
+}
+function initGameType() {
   // hardcoded
   cardBitCounts = [2, 5];
-  var card = randCard();
-  drawCard(card);
+
+  var b = [0, 1];
+  deckOrig = arrSequence(
+    map(function(x){return tail(arrSequence(replicate(x, b)));},
+    cardBitCounts));
+
+  // gfx
 }
-// this function is really just for testing
-function randCard() {
-  var ret = [];
-  for (var i in cardBitCounts) {
-    bits = cardBitCounts[i];
-    var curBits = [];
-    for (var j = 0; j < bits; j++) {
-      curBits[j] = randInt(0, 1);
-    }
-    ret[i] = curBits;
-  }
-  return ret;
+function initGame() {
+  deck = arrCopy(deckOrig);
+  shuffle(deck);
 }
-function drawCard(card) {
-  var x = 10;
-  var y = 10;
+function drawCard(card, x, y) {
   var omni = 24;
   var bitW = 2 * omni;
   var bitH = 2 * omni;
@@ -93,7 +98,7 @@ function drawCard(card) {
       var count = counts[j];
       for (k = 0; k < count; k++) {
         var bitX = x + cardW / 2 + (k - count / 2) * bitW;
-        if (!card[i][curCol]) {
+        if (card[i][curCol]) {
           g.fillRect(bitX, y + curY, bitW, bitH);
         }
         g.strokeRect(bitX, y + curY, bitW, bitH);
@@ -111,6 +116,65 @@ function randFloat(a, b) {
 // a uniform random int in [a, b]
 function randInt(a, b) {
   return Math.floor(randFloat(a, b + 1));
+}
+function shuffle(a) {
+  var i = a.length;
+  if (i == 0) {
+    return [];
+  }
+  while (--i) {
+    var j = randInt(0, i);
+    var tmp = a[i];
+    a[i] = a[j];
+    a[j] = tmp;
+  }
+}
+
+//
+// missing (i think) functions ported from haskell, and hacks
+//
+
+function arrSequence(arrs) {
+  if (arrs.length == 0) {
+    return [[]];
+  }
+  var arr0 = arrs[0];
+  var seqRest = arrSequence(tail(arrs));
+  var k = 0;
+  var ret = [];
+  for (var i in arr0) {
+    for (var j in seqRest) {
+      ret[k] = [arr0[i]].concat(seqRest[j]);
+      k++;
+    }
+  }
+  return ret;
+}
+function replicate(n, x) {
+  var ret = [];
+  for (var i = 0; i < n; i++) {
+     ret[i] = x;
+  }
+  return ret;
+}
+function tail(l) {
+  return l.slice(1);
+}
+function map(f, xs) {
+  var ret = [];
+  for (i in xs) {
+    ret[i] = f(xs[i]);
+  }
+  return ret;
+}
+function concat(arrs) {
+  if (arrs.length == 0) {
+    return [];
+  }
+  return arrs[0].concat(concat(tail(arrs)));
+}
+function arrCopy(arr) {
+  return arr.slice(0);
 }
 </script>
 </head>
