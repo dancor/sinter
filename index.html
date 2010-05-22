@@ -19,6 +19,7 @@ body {
 </style>
 <script type="text/javascript">
 // are we overusing globals
+var menu;
 var canv;
 var g;
 var winW = 0;
@@ -48,6 +49,9 @@ var tableMarginH = omni / 2;
 var cardSepW = omni / 2;
 var cardSepH = omni / 2;
 function init() {
+  menu = document.getElementById("chooseDeckSize");
+  canv = document.getElementById("canvas");
+  g = canv.getContext("2d");
   initWin();
   var deckTypeStr = getParam("d");
   if (deckTypeStr) {
@@ -65,15 +69,27 @@ function init() {
     initGameType();
     initGame();
   }
+  window.onresize = function(){
+    // todo: do something if cards go off bottom of screen
+    initWin();
+    var cardsOutOld = cardsOut;
+    var dealCardWOld = dealCardW;
+    calcDealCardW();
+    for (var j = 0; j < cardsOutOld.length; j++) {
+      for (var i = 0; i < dealCardWOld; i++) {
+        if (cardsOutOld[j][i]) {
+          placeCard(cardsOutOld[j][i]);
+        }
+      }
+    }
+    return true;
+  }
 }
 function initWin() {
-  menu = document.getElementById("chooseDeckSize");
-  canv = document.getElementById("canvas");
   winW = window.innerWidth;
-  winH = window.innerWidth;
+  winH = window.innerHeight;
   canv.width = winW;
   canv.height = winH;
-  g = canv.getContext("2d");
   g.fillStyle = winBg;
   g.fillRect(0, 0, winW, winH);
 }
@@ -119,7 +135,9 @@ function initGameType() {
   // todo: cooler heuristic?
   dealInitially = Math.max(3, Math.round(12 * deckOrig.length / 81));
 
-  // todo: cooler width and placement heuristics?
+  calcDealCardW();
+}
+function calcDealCardW() {
   dealCardW = Math.floor(
     (winW - 2 * tableMarginW + cardSepW) / (cardW + cardSepW));
   cardsOut = replicateArr(Math.ceil(deckOrig.length / dealCardW), 
@@ -132,22 +150,25 @@ function initGame() {
     dealCard();
   }
 }
-function dealCard() {
-  if (deckPos >= deck.length) {
-    return;
-  }
+function placeCard(card) {
   for (var j = 0; ; j++) {
     for (var i = 0; i < dealCardW; i++) {
       if (!cardsOut[j][i]) {
-        cardsOut[j][i] = deck[deckPos];
-        drawCard(deck[deckPos], 
+        cardsOut[j][i] = card;
+        drawCard(card,
           tableMarginW + i * (cardW + cardSepW), 
           tableMarginH + j * (cardH + cardSepH));
-        deckPos++;
         return;
       }
     }
   }
+}
+function dealCard() {
+  if (deckPos >= deck.length) {
+    return;
+  }
+  placeCard(deck[deckPos]);
+  deckPos++;
 }
 function drawCard(card, x, y) {
   g.fillStyle = cardBg;
@@ -241,6 +262,7 @@ function replicate(n, x) {
   }
   return ret;
 }
+// fixme: duplication..?
 function replicateArr(n, x) {
   var ret = [];
   for (var i = 0; i < n; i++) {
