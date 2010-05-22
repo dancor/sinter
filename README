@@ -37,4 +37,15 @@ All have 5 or fewer property-sets with 8 or fewer bits each,
 and 10 or fewer total bits per card.
 
 Todo
-- Currently hard-coded to 93-card deck for initial testing.
+- Time games
+- Computer find a set for me
+- Know when wrong about no set existing
+- Scoreboard?
+- Multiplayer?
+- Analytics about kinds of sets one tends to see or miss
+
+Compatilibily
+- We only currently test in google chrome
+  - One test browser is: chromium 5.0.365.0
+- We used to test in firefox but the js was running so much more slowly there
+  that we gave that up for now.
