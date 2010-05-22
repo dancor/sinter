@@ -22,6 +22,10 @@ var deck = [];
 var rowCounts = [];
 var cardW = 0;
 var cardH = 0;
+var dealInitially = 0;
+var deckPos = 0;
+var cardsOut = [[]];
+var dealCardW = 0;
 // gfx settings
 var cardBg = "#000";
 var cardFg = "#FFF";
@@ -32,20 +36,14 @@ var bitH = 2 * omni;
 var propSpacing = omni;
 var cardMarginW = omni;
 var cardMarginH = omni;
-var tableMarginW = omni;
-var tableMarginH = omni;
-var cardSepW = omni;
-var cardSepH = omni;
+var tableMarginW = omni / 2;
+var tableMarginH = omni / 2;
+var cardSepW = omni / 2;
+var cardSepH = omni / 2;
 function init() {
   initWin();
   initGameType();
   initGame();
-
-  for (i = 0; i < 5; i++) {
-    drawCard(deck[i], 
-      tableMarginW + i * (cardW + cardSepW), 
-      tableMarginH);
-  }
 }
 function initWin() {
   canv = document.getElementById("canvas");
@@ -65,7 +63,7 @@ function initGameType() {
 
   var b = [0, 1];
   deckOrig = arrSequence(
-    map(function(x){return tail(arrSequence(replicate(x, b)));},
+    map(function(x){return tail(arrSequence(replicateArr(x, b)));},
     cardBitCounts));
 
   cardH = cardMarginH * 2;
@@ -83,10 +81,38 @@ function initGameType() {
   }
   cardH -= propSpacing;
   cardW = maxRowCount * bitW + 2 * cardMarginW;
+
+  // todo: compute this based on odds of finding a set?
+  dealInitially = 12;
+
+  // todo: compute based on screen?
+  dealCardW = 4;
+  cardsOut = replicateArr(Math.ceil(deckOrig.length / dealCardW), 
+    replicate(dealCardW, false));
 }
 function initGame() {
   deck = arrCopy(deckOrig);
   shuffle(deck);
+  for (i = 0; i < dealInitially; i++) {
+    dealCard();
+  }
+}
+function dealCard() {
+  if (deckPos >= deck.length) {
+    return;
+  }
+  for (var j = 0; ; j++) {
+    for (var i = 0; i < dealCardW; i++) {
+      if (!cardsOut[j][i]) {
+        cardsOut[j][i] = deck[deckPos];
+        drawCard(deck[deckPos], 
+          tableMarginW + i * (cardW + cardSepW), 
+          tableMarginH + j * (cardH + cardSepH));
+        deckPos++;
+        return;
+      }
+    }
+  }
 }
 function drawCard(card, x, y) {
   g.fillStyle = cardBg;
@@ -160,6 +186,13 @@ function replicate(n, x) {
   var ret = [];
   for (var i = 0; i < n; i++) {
      ret[i] = x;
+  }
+  return ret;
+}
+function replicateArr(n, x) {
+  var ret = [];
+  for (var i = 0; i < n; i++) {
+     ret[i] = arrCopy(x);
   }
   return ret;
 }
