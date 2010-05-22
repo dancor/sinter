@@ -9,6 +9,9 @@ body {
   overflow-x: hidden;
   overflow-y: hidden;
 }
+.tableBg {
+  background: #070;
+}
 #gameBar {
   display: none;
   position: absolute;
@@ -18,6 +21,14 @@ body {
 }
 .header {
   background: black;
+  color: white;
+}
+#dealMore {
+  float: left;
+}
+#cardsLeft {
+  float: left;
+  margin: 4px;
   color: white;
 }
 </style>
@@ -39,6 +50,7 @@ var cardsOut = [[]];
 var dealCardW = 0;
 var cardsSelected = [];
 var cardsBad = [];
+var cardsLeft;
 // gfx settings
 var cardBgC = "";
 var cardBgCSel = "";
@@ -60,6 +72,7 @@ function init() {
   var menuBar = document.getElementById("menuBar");
   var gameBar = document.getElementById("gameBar");
   var dealMore = document.getElementById("dealMore");
+  cardsLeft = document.getElementById("cardsLeft");
   canv = document.getElementById("canvas");
   g = canv.getContext("2d");
 
@@ -294,10 +307,18 @@ function initGameType() {
 function calcDealCardW() {
   dealCardW = Math.floor(
     (winW - 2 * tableMarginW + cardSepW) / (cardW + cardSepW));
+  initCardsOut();
+}
+function initCardsOut() {
   cardsOut = replicateArr(Math.ceil(deckOrig.length / dealCardW), 
     replicate(dealCardW, false));
 }
 function initGame() {
+  initCardsOut();
+  cardsSelected = [];
+  cardsBad = [];
+  dealMore.value = "Deal More";
+  deckPos = 0;
   deck = arrCopy(deckOrig);
   shuffle(deck);
   for (i = 0; i < dealInitially; i++) {
@@ -305,12 +326,22 @@ function initGame() {
   }
 }
 function dealCard() {
+  if (deck.length == deckPos) {
+    drawTable();
+    initGame();
+    return;
+  }
   if (deckPos >= deck.length) {
     return;
   }
   var tmp = placeCard(deck[deckPos]);
   drawCardOut(tmp[0], tmp[1]);
   deckPos++;
+  var n = deck.length - deckPos;
+  cardsLeft.innerHTML = n + " left";
+  if (n == 0) {
+    dealMore.value = "New Deal";
+  }
 }
 function placeCard(card) {
   for (var j = 0; ; j++) {
@@ -486,7 +517,7 @@ function any(f, a) {
 </script>
 </head>
 <body onload="init()">
-<div id="menuBar" class="bigMenu header">
+<div id="menuBar" class="bigMenu header tableBg">
   <form>
   Choose Deck Size
   <select name="d" class="bigMenu">
@@ -511,8 +542,9 @@ function any(f, a) {
   <input class="bigMenu" type="submit" value="Go" />
   </form>
 </div>
-<div id="gameBar" class="bigMenu header">
+<div id="gameBar" class="bigMenu tableBg">
   <input id="dealMore" class="bigMenu" type="button" value="Deal More" />
+  <div id="cardsLeft" class="tableBg"></div>
 </div>
 <canvas id="canvas" width=0 height=0 onmousedown="return false;"></canvas>
 </body>
