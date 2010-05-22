@@ -12,9 +12,6 @@ body {
 </style>
 <script type="text/javascript">
 // are we overusing globals
-var cardBg = "#000";
-var cardFg = "#FFF";
-var winBg = "#070";
 var canv;
 var g;
 var winW = 0;
@@ -22,12 +19,33 @@ var winH = 0;
 var cardBitCounts = [];
 var deckOrig = [];
 var deck = [];
+var rowCounts = [];
+var cardW = 0;
+var cardH = 0;
+// gfx settings
+var cardBg = "#000";
+var cardFg = "#FFF";
+var winBg = "#070";
+var omni = 24;
+var bitW = 2 * omni;
+var bitH = 2 * omni;
+var propSpacing = omni;
+var cardMarginW = omni;
+var cardMarginH = omni;
+var tableMarginW = omni;
+var tableMarginH = omni;
+var cardSepW = omni;
+var cardSepH = omni;
 function init() {
   initWin();
   initGameType();
   initGame();
 
-  drawCard(deck[0], 10, 10);
+  for (i = 0; i < 5; i++) {
+    drawCard(deck[i], 
+      tableMarginW + i * (cardW + cardSepW), 
+      tableMarginH);
+  }
 }
 function initWin() {
   canv = document.getElementById("canvas");
@@ -42,36 +60,19 @@ function initWin() {
 function initGameType() {
   // hardcoded
   cardBitCounts = [2, 5];
+  // todo: generate
+  rowCounts = [[2], [3, 2]];
 
   var b = [0, 1];
   deckOrig = arrSequence(
     map(function(x){return tail(arrSequence(replicate(x, b)));},
     cardBitCounts));
 
-  // gfx
-}
-function initGame() {
-  deck = arrCopy(deckOrig);
-  shuffle(deck);
-}
-function drawCard(card, x, y) {
-  var omni = 24;
-  var bitW = 2 * omni;
-  var bitH = 2 * omni;
-  var propSpacing = omni;
-  var marginW = omni;
-  var marginH = omni;
-  // todo: generate
-  var rowCounts = [[2], [3, 2]];
-  var i;
-  var j;
-  var k;
-
-  var cardH = marginH * 2;
+  cardH = cardMarginH * 2;
   var maxRowCount = 0;
-  for (i in rowCounts) {
+  for (var i in rowCounts) {
     var counts = rowCounts[i];
-    for (j in counts) {
+    for (var j in counts) {
       count = counts[j];
       if (count > maxRowCount) {
         maxRowCount = count;
@@ -81,22 +82,27 @@ function drawCard(card, x, y) {
     cardH += propSpacing;
   }
   cardH -= propSpacing;
-  var cardW = maxRowCount * bitW + 2 * marginW;
-
+  cardW = maxRowCount * bitW + 2 * cardMarginW;
+}
+function initGame() {
+  deck = arrCopy(deckOrig);
+  shuffle(deck);
+}
+function drawCard(card, x, y) {
   g.fillStyle = cardBg;
   g.strokeStyle = cardFg;
   g.fillRect(x, y, cardW, cardH);
   g.strokeRect(x, y, cardW, cardH);
 
-  var curY = marginH;
+  var curY = cardMarginH;
   g.fillStyle = cardFg;
   g.strokeStyle = "#888";
-  for (i in rowCounts) {
+  for (var i in rowCounts) {
     var counts = rowCounts[i];
     var curCol = 0;
-    for (j in counts) {
+    for (var j in counts) {
       var count = counts[j];
-      for (k = 0; k < count; k++) {
+      for (var k = 0; k < count; k++) {
         var bitX = x + cardW / 2 + (k - count / 2) * bitW;
         if (card[i][curCol]) {
           g.fillRect(bitX, y + curY, bitW, bitH);
