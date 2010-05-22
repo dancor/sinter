@@ -10,6 +10,7 @@ body {
   overflow-y: hidden;
 }
 #gameBar {
+  display: none;
   position: absolute;
 }
 .bigMenu {
@@ -60,22 +61,24 @@ function init() {
   cardBg = "#000";
   cardFg = "#FFF";
   winBg = "#070";
-  omni = 24;
-  bitW = 2 * omni;
-  bitH = 2 * omni;
-  propSpacing = omni;
-  cardMarginW = omni;
-  cardMarginH = omni;
-  tableMarginW = omni / 2;
-  tableMarginH = omni / 2 + gameBar.clientHeight;
-  cardSepW = omni / 2;
-  cardSepH = omni / 2;
 
   initWin();
   var deckTypeStr = getParam("d");
   if (deckTypeStr) {
     menuBar.style.display = "none";
     gameBar.style.display = "inline";
+
+    omni = 24;
+    bitW = 2 * omni;
+    bitH = 2 * omni;
+    propSpacing = omni;
+    cardMarginW = omni;
+    cardMarginH = omni;
+    tableMarginW = omni / 2;
+    tableMarginH = omni / 2 + gameBar.clientHeight;
+    cardSepW = omni / 2;
+    cardSepH = omni / 2;
+
     // fixme: hack; should decode
     //cardBitCounts = deckTypeStr.split(",");
     cardBitCounts = deckTypeStr.split("%2C").slice(0, 32);
