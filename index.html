@@ -369,18 +369,18 @@ function initGame() {
     dealCard();
   }
   startTime = (new Date()).getTime();
+  updateTimer(); // or previous game time stays around for a second awkwardly
   timerId = setInterval(updateTimer, 1000);
 }
 function updateTimer() {
   var curTime = (new Date()).getTime();
   timerDiv.innerHTML = Math.round((curTime - startTime) / 1000) + 's';
 }
+function finalizeTimer() {
+  var curTime = (new Date()).getTime();
+  timerDiv.innerHTML = (curTime - startTime) / 1000 + 's';
+}
 function dealCard() {
-  if (deck.length == deckPos) {
-    drawTable();
-    initGame();
-    return;
-  }
   if (deckPos >= deck.length) {
     return;
   }
@@ -390,10 +390,20 @@ function dealCard() {
   var n = deck.length - deckPos;
   cardsLeftDiv.innerHTML = n + " left";
   if (n == 0) {
-    dealMoreBtn.value = "New Deal";
+    dealMoreBtn.value = "End Game";
   }
 }
 function dealCardClick() {
+  if (dealMoreBtn.value == "End Game") {
+    clearInterval(timerId);
+    finalizeTimer();
+    dealMoreBtn.value = "New Deal";
+    return;
+  } else if (dealMoreBtn.value == "New Deal") {
+    drawTable();
+    initGame();
+    return;
+  }
   if (allowOverdeal || arrEq(findAllTriples(), [])) {
     dealCard();
   } else {
