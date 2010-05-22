@@ -57,9 +57,24 @@ function initWin() {
 }
 function initGameType() {
   // hardcoded
+  //cardBitCounts = [2, 2, 2];
   cardBitCounts = [2, 5];
-  // todo: generate
-  rowCounts = [[2], [3, 2]];
+  rowCounts = [];
+  for (var i in cardBitCounts) {
+    var c = cardBitCounts[i];
+    var cTrips = Math.floor(c / 3);
+    switch (c % 3) {
+    case 0:
+      rowCounts[i] = replicate(cTrips, 3);
+      break;
+    case 1:
+      rowCounts[i] = [2].concat(replicate(cTrips - 1, 3), [2]);
+      break;
+    case 2:
+      rowCounts[i] = replicate(cTrips, 3).concat(2);
+      break;
+    }
+  }
 
   var b = [0, 1];
   deckOrig = arrSequence(
