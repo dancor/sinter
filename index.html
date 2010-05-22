@@ -79,9 +79,13 @@ function init() {
     cardSepW = omni / 2;
     cardSepH = omni / 2;
 
-    // fixme: hack; should decode
-    //cardBitCounts = deckTypeStr.split(",");
-    cardBitCounts = deckTypeStr.split("%2C").slice(0, 32);
+    // fixme: hack; getParam() should decode values
+    // fixme: superwtf: encoded iff manually typed right now..?
+    if (deckTypeStr.indexOf(",") == -1) {
+      cardBitCounts = deckTypeStr.split("%2C").slice(0, 32);
+    } else {
+      cardBitCounts = deckTypeStr.split(",");
+    }
     for (var i in cardBitCounts) {
       var n = Number(cardBitCounts[i]);
       if (isNaN(n) || n < 2 || n > 16) {
@@ -108,6 +112,37 @@ function init() {
     return true;
   }
   dealMore.onclick = dealCard;
+  canv.onclick = function(e){
+    var xRel = e.x - tableMarginW;
+    if (xRel < 0) {
+      return;
+    }
+    var gridW = cardW + cardSepW;
+    if (xRel % gridW > cardW) {
+     return;
+    }
+    var x = Math.floor(xRel / gridW);
+
+    var yRel = e.y - tableMarginH;
+    if (yRel < 0) {
+      return;
+    }
+    var gridH = cardH + cardSepH;
+    if (yRel % gridH > cardH) {
+     return;
+    }
+    var y = Math.floor(yRel / gridH);
+
+    var row = cardsOut[y];
+    if (!row) {
+      return;
+    }
+    if (!row[x]) {
+      return;
+    }
+    row[x] = cardsOut[y];
+    // todo: select cardsOut[y][x]
+  }
 }
 function initWin() {
   winW = window.innerWidth;
