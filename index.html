@@ -69,9 +69,20 @@ var propSpacing = 0;
 var cardMarginW = 0;
 var cardMarginH = 0;
 var tableMarginW = 0;
-var tableMarginH = 0; 
+var tableMarginH = 0;
 var cardSepW = 0;
 var cardSepH = 0;
+function omniResize(omni) {
+  bitW = 2 * omni;
+  bitH = 2 * omni;
+  propSpacing = omni;
+  cardMarginW = omni;
+  cardMarginH = omni;
+  tableMarginW = omni / 2;
+  tableMarginH = omni / 2 + gameBar.clientHeight;
+  cardSepW = omni / 2;
+  cardSepH = omni / 2;
+}
 function init() {
   var menuBar = document.getElementById("menuBar");
   var gameBar = document.getElementById("gameBar");
@@ -100,16 +111,7 @@ function init() {
     menuBar.style.display = "none";
     gameBar.style.display = "inline";
 
-    omni = 24;
-    bitW = 2 * omni;
-    bitH = 2 * omni;
-    propSpacing = omni;
-    cardMarginW = omni;
-    cardMarginH = omni;
-    tableMarginW = omni / 2;
-    tableMarginH = omni / 2 + gameBar.clientHeight;
-    cardSepW = omni / 2;
-    cardSepH = omni / 2;
+    omniResize(16);
 
     // fixme: hack; getParam() should decode values
     // fixme: superwtf: encoded iff manually typed right now..?
@@ -196,7 +198,7 @@ function canvClick(e) {
   cardsBad = [];
   for (var i in cardsSelected) {
     if (arrEq(cardsSelected[i], [x, y])) {
-      cardsSelected.splice(i, 1);   
+      cardsSelected.splice(i, 1);
       redraw();
       return;
     }
@@ -289,7 +291,7 @@ function drawCardOut(i, j) {
     bgCol = cardBgC;
   }
   drawCard(cardsOut[j][i],
-    tableMarginW + i * (cardW + cardSepW), 
+    tableMarginW + i * (cardW + cardSepW),
     tableMarginH + j * (cardH + cardSepH),
     bgCol);
 }
@@ -354,7 +356,7 @@ function calcDealCardW() {
   initCardsOut();
 }
 function initCardsOut() {
-  cardsOut = replicateArr(Math.ceil(deckOrig.length / dealCardW), 
+  cardsOut = replicateArr(Math.ceil(deckOrig.length / dealCardW),
     replicate(dealCardW, false));
 }
 function initGame() {
@@ -388,7 +390,7 @@ function dealCard() {
   drawCardOut(tmp[0], tmp[1]);
   deckPos++;
   var n = deck.length - deckPos;
-  cardsLeftDiv.innerHTML = n + " left";
+  cardsLeftDiv.innerHTML = n + " undealt";
   if (n == 0) {
     dealMoreBtn.value = "End Game";
   }
@@ -595,19 +597,22 @@ function any(f, a) {
   <option value="2,2,2">27</option>
   <option value="5">31</option>
   <option value="2,4">45</option>
+  <option value="3,3">49</option>
   <option value="6">63</option>
   <option value="2,2,2,2">81</option>
   <option value="2,5" selected>93</option>
   <option value="3,4">105</option>
   <option value="7">127</option>
   <option value="2,2,4">135</option>
-  <option value="2,2,2,3">189</option>
+  <option value="2,3,3">147</option>
+  <option value="2,6">189</option>
   <option value="3,5">217</option>
+  <option value="4,4">225</option>
   <option value="2,2,2,2,2">243</option>
   <option value="8">255</option>
   </select>
   <input type="checkbox" name="t" class="bigMenu" value="1" />timer
-  <input type="checkbox" name="o" class="bigMenu" value="1" checked 
+  <input type="checkbox" name="o" class="bigMenu" value="1" checked
   />allow-overdeal
   <input class="bigMenu" type="submit" value="Go" />
   </form>
