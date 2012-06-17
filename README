@@ -2,8 +2,8 @@ Sinter is an HTML5 implementation of affine-projective steiner triple
 system (STS) card games.  These are card games in which you are trying to
 find card triples satisfying a simple rule.  In the bit respresentation,
 the rule is that XOR-ing two of the cards produces the 3rd one.  So for
-each bit position, exactly 2 of the 3 cards have a 1 bit.
-For example, for 1010 and 0111 the matching card is 1101.
+each bit position, exactly 0 or 2 of the 3 cards have a 1 bit.
+For example, for 1010 and 0110 the matching card is 1100.
 
 These card games exist for all card deck sizes of the form
 Product(2^i - 1)
